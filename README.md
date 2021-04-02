@@ -8,7 +8,9 @@ The idea is that it could parse expressions given by the user, printing the eval
 ## TODO
 
 - [ ] Lexer
+  - [x] Something that identifies numbers and basic arithmetic operators and spits out tokens
+  - [ ] Lexer errors
 - [ ] Parser
 - [ ] Main loop with lexer and parser
-- [ ] '+', '-', '*', '/', '(', ')'
-- [ ]  '^', '%'
+- [ ] The lesser known operators: '^' and '%'
+- [ ] Scientific notation

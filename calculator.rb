@@ -35,94 +35,99 @@ fact -> NUM
 =end
 
 class Calculator
-	def initialize()
-		@parser = Parser.new
-		@lexer = Lexer.new
-	end
+  def initialize()
+	@parser = Parser.new
+	@lexer = Lexer.new
+  end
 end
 
 class Parser
-	def parse(input)
-	end
+  def parse(input)
+  end
 end
 
 class Lexer
-	attr_accessor :line
-	attr_reader :idx
-	
-	def initialize
-		@idx = 0
-	end
+  
+  class LexerError < ::RuntimeError
+  end
+  class IvalidChar < LexerError
+  end
 
-	def next
-		puts @idx
-		whitespace
-		p @idx
-		if @idx >= @line.length
-			return Token.new("", "end")
-		end
-		char = @line[@idx]
-		ascii = char.ord
-		if ascii >= 48 && ascii <= 57 # [0-9]
-			return number
-		end
-		@idx += 1
-		case char
-			when '+', '-', '*', '/'
-				return Token.new(char, "operator")
-			when '('
-				return Token.new(char, "(")
-			when ')'
-				return Token.new(char, ")")
-			else
-				puts "LEXER ERROR: " + char
-		end
-	end
-	
-	def number
-		lexeme = integer
-		if @line[@idx] == '.'
-			lexeme << '.'
-			@idx += 1
-			lexeme << integer
-		end
-		return Token.new(lexeme, "number")
-	end
-	
-	def integer
-		lexeme = ""
-		ascii = @line[@idx].ord
-		while ascii >= 48 && ascii <= 57 # [0-9]
-			lexeme << @line[@idx]
-			@idx += 1
-			ascii = @line[@idx].ord
-		end
-		return lexeme
-	end
-	
-	def whitespace
-		while @line[@idx] == ' ' || @line[@idx] == "\t"
-			@idx += 1
-		end
-	end
+  attr_accessor :line
+  attr_reader :idx
+  
+  @@One_character_tokens =  {
+                              "+" => "operator",
+                              "-" => "operator",
+                              "*" => "operator",
+                              "/" => "operator",
+                              "(" => "open-parenthesis",
+                              ")" => "close-parenthesis"
+                            }
+  
+  def initialize
+  	@idx = 0
+  end
+  
+  def line=(newline)
+    @line = newline
+    @idx = 0
+  end
+  
+  def next
+    whitespace
+
+    if @idx >= @line.length
+  	return Token.new("", "end")
+    end
+    
+    char = @line[@idx]
+    if char >= '0' && char <= '9'
+      return number
+    end
+    
+    @idx += 1
+
+    if @@One_character_tokens[char]
+      return Token.new(char, @@One_character_tokens[char])
+    end
+
+  	raise IvalidChar, "Invalid character: " + char
+  end
+  
+  private
+  
+  def number
+  	lexeme = integer
+  	if @line[@idx] && @line[@idx] == '.'
+  	  lexeme << '.'
+  	  @idx += 1
+  	  lexeme << integer
+  	end
+  	return Token.new(lexeme, "number")
+  end
+  
+  def integer
+  	lexeme = ""
+  	while @line[@idx] && @line[@idx] >= '0' && @line[@idx] <= '9'
+  	  lexeme << @line[@idx]
+  	  @idx += 1
+  	end
+  	return lexeme
+  end
+  
+  def whitespace
+    while @line[@idx] == ' ' || @line[@idx] == "\t"
+  	  @idx += 1
+  	end
+  end
 end
 
 class Token
-	attr_reader :lexeme, :kind
-	def initialize(lexeme, kind)
-		@lexeme = lexeme
-		@kind = kind
-	end
+  attr_reader :lexeme, :kind
+  def initialize(lexeme, kind)
+	@lexeme = lexeme
+	@kind = kind
+  end
 end
 
-lexer = Lexer.new
-string = "  1+399 * (4 + 7.5 -	3)	"
-lexer.line = string
-puts "length = " + string.length.to_s
-token = lexer.next
-while token.kind != "end"
-	puts "lexeme: " + token.lexeme + " | kind: " + token.kind
-	token = lexer.next
-end
-puts "line: \"" + lexer.line + "\""
-puts "idx:    " + lexer.idx.to_s

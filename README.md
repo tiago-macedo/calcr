@@ -1,4 +1,5 @@
 # calcr
+
 General calculator implementation in Ruby.
 
 This was coded so I could learn Ruby, do not expect it to be functional/good/maintainable.

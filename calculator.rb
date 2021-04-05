@@ -19,18 +19,18 @@ operator   : '+' | '-' | '*' | '/'
 | The grammar: |
 \==============/
 
-S -> expr
+S -> expr { run($1) }
 
-expr -> expr + term
-      | expr - term
-	  | term
+expr -> expr + term { $$ = $1 + $2 + "+" }
+      | expr - term { $$ = $1 + $2 + "-" }
+	  | term        { $$ = $1 }
 
-term -> term * fact
-      | term / fact
-	  | fact
+term -> term * fact { $$ = $1 + $2 + "*" }
+      | term / fact { $$ = $1 + $2 + "/" }
+	  | fact        { $$ = $1 }
 
-fact -> NUM
-      | '(' expr ')'
+fact -> NUM          { $$ = $1 }
+      | '(' expr ')' { $$ = $2 }
 
 =end
 
@@ -42,7 +42,37 @@ class Calculator
 end
 
 class Parser
+
+  class ParserError < ::RuntimeError
+  end
+
+  class BadToken < ParserError
+  end
+  
+  attr_accessor :tokens
+  attr_reader :idx
+
+  def match(expected)
+    if @tokens[@idx] == expected
+      @idx += 1
+    else
+      raise BadToken, "expected " + expected + ", got " + @tokens[@idx]
+    end
+  end
+
   def parse(input)
+    @idx = 0
+    S(input)
+  end
+
+  def S(input)
+    puts expr(input)
+  end
+
+  def expr(input)
+    t1 = input[@idx + 0]
+    t2 = input[@idx + 1]
+    t3 = input[@idx + 2]
   end
 end
 
@@ -50,7 +80,7 @@ class Lexer
   
   class LexerError < ::RuntimeError
   end
-  class IvalidChar < LexerError
+  class BadChar < LexerError
   end
 
   attr_accessor :line
@@ -78,7 +108,7 @@ class Lexer
     whitespace
 
     if @idx >= @line.length
-  	return Token.new("", "end")
+      return Token.new("", "end")
     end
     
     char = @line[@idx]
@@ -92,7 +122,7 @@ class Lexer
       return Token.new(char, @@One_character_tokens[char])
     end
 
-  	raise IvalidChar, "Invalid character: " + char
+  	raise BadChar, "Invalid character: " + char
   end
   
   private
@@ -124,10 +154,19 @@ class Lexer
 end
 
 class Token
+
   attr_reader :lexeme, :kind
+  
   def initialize(lexeme, kind)
 	@lexeme = lexeme
 	@kind = kind
   end
-end
 
+  def ==(other)
+    @kind == other.kind && @lexeme == other.lexeme
+  end
+
+  def to_s
+    "\"" + @lexeme + "\"(" + @kind + ")"
+  end
+end

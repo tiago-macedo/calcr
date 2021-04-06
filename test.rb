@@ -1,54 +1,29 @@
 require './calculator.rb'
 
 
-def run_lexer(lexer)
-  token = lexer.next
-  while token.kind != "end"
-    print token, "\t"
-  	token = lexer.next
-  end
-  print "\n"
-end
-
-def lexer
-  puts "LEXER TEST"
-  puts "=========="
-  my_lexer = Lexer.new
-  
+def lexer_run
+  puts "LEXER RUN TEST"
+  puts "=============="
+  lexer = Lexer.new
+  lexer.line = "2 + 2 - 3"
+  puts lexer.run
+  puts "-----"
+  lexer.line = ""
+  puts lexer.run
+  puts "-----"
+  lexer.line = "(2+     ) 3.14 -"
+  puts lexer.run
+  puts "-----"
   begin
-    my_lexer.line = "  1+399 * (4 + 7.5 -	3)	"
-    run_lexer my_lexer
+    lexer.line = "abcde"
+    puts lexer.run
   rescue Exception => e
     puts e.inspect
   end
-  puts "----------"
-
-  begin
-    my_lexer.line = "1 + 2 + 3 + 4"
-    run_lexer my_lexer
-  rescue Exception => e
-    puts e.inspect
-  end
-  puts "----------"
-
-  begin
-    my_lexer.line = ""
-    run_lexer my_lexer
-  rescue Exception => e
-    puts e.inspect
-  end
-  puts "----------"
-
-  begin
-    my_lexer.line = "abcde"
-    run_lexer my_lexer
-  rescue Exception => e
-    puts e.inspect
-  end
-  puts "----------"
-
+  puts "-----"
   puts
 end
+
 
 def token_equals
   puts "TOKEN TEST"
@@ -64,8 +39,9 @@ def token_equals
   puts
 end
 
+
 def parser_match
-  puts "PARSER TEST"
+  puts "PARSER MATCH TEST"
   puts "==========="
 
   parser = Parser.new
@@ -80,10 +56,37 @@ def parser_match
     puts e.inspect
     puts "Case 2 ok..."
   end
-  
   puts
 end
 
-lexer
+
+def parser_translate
+  puts "PARSER TRANSLATE TEST"
+  puts "====================="
+  
+  lexer = Lexer.new
+  parser = Parser.new
+
+  test = "2+2-3"
+  lexer.line = test
+  parser.tokens = lexer.run
+  p parser.tokens
+  puts test + " becomes:"
+  parser.parse
+  puts "-----"
+
+  test = "(2)   -4 * (1 + 3)"
+  lexer.line = test
+  p parser.tokens
+  parser.tokens = lexer.run
+  puts test + " becomes:"
+  parser.parse
+  puts "-----"
+
+  puts
+end
+
+lexer_run
 token_equals
 parser_match
+parser_translate

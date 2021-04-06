@@ -19,7 +19,7 @@ operator   : '+' | '-' | '*' | '/'
 | The grammar: |
 \==============/
 
-S -> expr { run($1) }
+S -> expr END { run($1) }
 
 expr -> term expr~ { $$ = $1 $2 }
 
@@ -68,30 +68,68 @@ class Parser
     end
   end
 
-  def parse(input)
+  def parse
     @idx = 0
-    S(input)
+    puts start
   end
 
-  def S(input)
-    puts expr(input)
+  def start
+    return expr
+	match("end")
   end
 
-  def expr(input)
+  def expr
+    v1 = term
+    v2 = expr_
+	return v1 + v2
+  end
+
+  def expr_
+    if @tokens[@idx] == Token.new("+", "operator")
+      match "operator"
+      v2 = term
+	  v3 = expr_
+      return v2 + "+ " + v3
+    elsif @tokens[@idx] == Token.new("-", "operator")
+      match "operator"
+      v2 = term
+	  v3 = expr_
+      return v2 + "- " + v3
+    end
+    return ''
   end
   
   def term
-    
+    v1 = fact
+    v2 = term_
+	return v1 + v2
+  end
+  
+  def term_
+    if @tokens[@idx] == Token.new("*", "operator")
+      match "operator"
+      v2 = fact
+	  v3 = term_
+      return v2 + "* " + v3
+    elsif @tokens[@idx] == Token.new("/", "operator")
+      match "operator"
+      v2 = fact
+	  v3 = term_
+      return v2 + "/ " + v3
+    end
+    return ''
   end
   
   def fact
     case @tokens[@idx].kind
       when "open-parenthesis"
-        match("open-parenthesis")
-        expr
-        match("close-parenthesis")
+        match "open-parenthesis"
+        v2 = expr
+        match "close-parenthesis"
+		return v2
       when "number"
-        return @tokens[@idx].lexeme
+        match "number"
+        return @tokens[@idx-1].lexeme + ' '
       else
         raise BadToken, "expected a factor, got " + @token[@idx]
     end
@@ -127,7 +165,17 @@ class Lexer
     @idx = 0
   end
   
-  def next
+  def run
+    tokens = []
+    loop do
+      token = next_token
+      tokens << token
+      break if token.kind == "end"
+    end
+	return tokens
+  end
+  
+  def next_token
     whitespace
 
     if @idx >= @line.length
@@ -192,4 +240,9 @@ class Token
   def to_s
     "\"" + @lexeme + "\"(" + @kind + ")"
   end
+  
+  def inspect
+    to_s
+  end
+
 end

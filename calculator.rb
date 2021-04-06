@@ -21,13 +21,17 @@ operator   : '+' | '-' | '*' | '/'
 
 S -> expr { run($1) }
 
-expr -> expr + term { $$ = $1 + $2 + "+" }
-      | expr - term { $$ = $1 + $2 + "-" }
-	  | term        { $$ = $1 }
+expr -> term expr~ { $$ = $1 $2 }
 
-term -> term * fact { $$ = $1 + $2 + "*" }
-      | term / fact { $$ = $1 + $2 + "/" }
-	  | fact        { $$ = $1 }
+expr~ -> + term expr~ { $$ = $2 '+' $3 }
+       | - term expr~ { $$ = $2 '-' $3 }
+	   | ø      { $$ = nil }
+
+term -> fact term~ { $$ = $1 $2 }
+
+term~ -> * fact term~ { $$ = $2 '*' $3 }
+       | / fact term~ { $$ = $2 '/' $3 }
+	   | ø
 
 fact -> NUM          { $$ = $1 }
       | '(' expr ')' { $$ = $2 }

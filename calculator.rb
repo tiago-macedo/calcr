@@ -52,11 +52,15 @@ class Parser
   attr_accessor :tokens
   attr_reader :idx
 
+  def initialize
+    @idx = 0
+  end
+
   def match(expected)
-    if @tokens[@idx] == expected
+    if @tokens[@idx].kind == expected
       @idx += 1
     else
-      raise BadToken, "expected " + expected + ", got " + @tokens[@idx]
+      raise BadToken, "expected " + expected + ", got " + @tokens[@idx].to_s
     end
   end
 
@@ -70,10 +74,25 @@ class Parser
   end
 
   def expr(input)
-    t1 = input[@idx + 0]
-    t2 = input[@idx + 1]
-    t3 = input[@idx + 2]
   end
+  
+  def term
+    
+  end
+  
+  def fact
+    case @tokens[@idx].kind
+      when "open-parenthesis"
+        match("open-parenthesis")
+        expr
+        match("close-parenthesis")
+      when "number"
+        return @tokens[@idx].lexeme
+      else
+        raise BadToken, "expected a factor, got " + @token[@idx]
+    end
+  end
+  
 end
 
 class Lexer

@@ -69,16 +69,18 @@ def parser_match
   puts "==========="
 
   parser = Parser.new
-
+  parser.tokens = [Token.new("first", "kindA"), Token.new("second", "kindB")]
+  
   begin
-    parser.match(Token.new("aaa", "kindA"), Token.new("aaa", "kindA"))
+    parser.match("kindA")
     puts "Case 1 ok..."
-    parser.match(Token.new("aaa", "kindA"), Token.new("bbb", "kindB"))
-    puts "Case 2 ok..."
-  rescue Exception => e
+	parser.match("kindX")
+	puts "Case 2 was suppposed to raise an error!"
+  rescue Parser::BadToken => e
     puts e.inspect
+    puts "Case 2 ok..."
   end
-
+  
   puts
 end
 

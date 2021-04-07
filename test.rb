@@ -70,20 +70,29 @@ def parser_translate
   test = "2+2-3"
   lexer.line = test
   parser.tokens = lexer.run
-  p parser.tokens
   puts test + " becomes:"
-  parser.parse
+  print parser.parse, "\n"
   puts "-----"
 
   test = "(2)   -4 * (1 + 3)"
   lexer.line = test
-  p parser.tokens
   parser.tokens = lexer.run
   puts test + " becomes:"
-  parser.parse
+  print parser.parse, "\n"
   puts "-----"
 
+  test = ""
+  lexer.line = test
+  parser.tokens = lexer.run
+  puts test + "using an empty input:"
+  begin
+    print parser.parse, "\n"
+  rescue Parser::BadToken => e
+    puts e.inspect
+  end
+  puts "-----"
   puts
+
 end
 
 lexer_run

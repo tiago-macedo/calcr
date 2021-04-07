@@ -70,7 +70,26 @@ class Parser
 
   def parse
     @idx = 0
-    puts start
+    return start
+  end
+
+  private
+  
+  def join(a, b)
+    if not b and not a
+      return nil
+    elsif not b
+      return a
+    elsif not a
+      return b
+    end
+    # both a and b are here
+    b.each do |element|
+      if element
+        a << element
+      end
+    end
+	return a
   end
 
   def start
@@ -81,7 +100,7 @@ class Parser
   def expr
     v1 = term
     v2 = expr_
-	return v1 + v2
+	return join(v1, v2)
   end
 
   def expr_
@@ -89,20 +108,20 @@ class Parser
       match "operator"
       v2 = term
 	  v3 = expr_
-      return v2 + "+ " + v3
+      return join(join(v2, ["+"]), v3)
     elsif @tokens[@idx] == Token.new("-", "operator")
       match "operator"
       v2 = term
 	  v3 = expr_
-      return v2 + "- " + v3
+      return join(join(v2, ["-"]), v3)
     end
-    return ''
+    return nil
   end
   
   def term
     v1 = fact
     v2 = term_
-	return v1 + v2
+	return join(v1, v2)
   end
   
   def term_
@@ -110,14 +129,14 @@ class Parser
       match "operator"
       v2 = fact
 	  v3 = term_
-      return v2 + "* " + v3
+      return join(join(v2, ["*"]), v3)
     elsif @tokens[@idx] == Token.new("/", "operator")
       match "operator"
       v2 = fact
 	  v3 = term_
-      return v2 + "/ " + v3
+      return join(join(v2, ["/"]), v3)
     end
-    return ''
+    return nil
   end
   
   def fact
@@ -129,13 +148,14 @@ class Parser
 		return v2
       when "number"
         match "number"
-        return @tokens[@idx-1].lexeme + ' '
+        return [@tokens[@idx-1].lexeme]
       else
-        raise BadToken, "expected a factor, got " + @token[@idx]
+        raise BadToken, "expected a factor, got " + @tokens[@idx].to_s
     end
   end
   
 end
+
 
 class Lexer
   
@@ -224,6 +244,7 @@ class Lexer
   end
 end
 
+
 class Token
 
   attr_reader :lexeme, :kind
@@ -244,5 +265,12 @@ class Token
   def inspect
     to_s
   end
+
+end
+
+
+class StackMachine
+
+  
 
 end

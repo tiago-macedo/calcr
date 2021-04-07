@@ -93,8 +93,9 @@ class Parser
   end
 
   def start
-    return expr
+    v = expr
 	match("end")
+	return v
   end
 
   def expr

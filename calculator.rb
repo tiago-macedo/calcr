@@ -104,16 +104,18 @@ class Parser
   end
 
   def expr_
-    if @tokens[@idx] == Token.new("+", "operator")
+    plus  = Token.new("+", "operator")
+    minus = Token.new("-", "operator")
+    if @tokens[@idx] == plus
       match "operator"
       v2 = term
 	  v3 = expr_
-      return join(join(v2, ["+"]), v3)
-    elsif @tokens[@idx] == Token.new("-", "operator")
+      return join(join(v2, [plus]), v3)
+    elsif @tokens[@idx] == minus
       match "operator"
       v2 = term
 	  v3 = expr_
-      return join(join(v2, ["-"]), v3)
+      return join(join(v2, [minus]), v3)
     end
     return nil
   end
@@ -125,16 +127,18 @@ class Parser
   end
   
   def term_
-    if @tokens[@idx] == Token.new("*", "operator")
+    times = Token.new("*", "operator")
+    over  = Token.new("/", "operator")
+    if @tokens[@idx] == times
       match "operator"
       v2 = fact
 	  v3 = term_
-      return join(join(v2, ["*"]), v3)
-    elsif @tokens[@idx] == Token.new("/", "operator")
+      return join(join(v2, [times]), v3)
+    elsif @tokens[@idx] == over
       match "operator"
       v2 = fact
 	  v3 = term_
-      return join(join(v2, ["/"]), v3)
+      return join(join(v2, over), v3)
     end
     return nil
   end
@@ -148,7 +152,7 @@ class Parser
 		return v2
       when "number"
         match "number"
-        return [@tokens[@idx-1].lexeme]
+        return [@tokens[@idx-1]]
       else
         raise BadToken, "expected a factor, got " + @tokens[@idx].to_s
     end
@@ -271,6 +275,44 @@ end
 
 class StackMachine
 
-  
+  class StackError < ::RuntimeError
+  end
+
+  class BadToken < StackError
+  end
+
+  attr_reader :stack
+
+  def initialize
+    @stack = []
+  end
+
+  def run(input)
+    input.each do |token|
+      case token.kind
+		when  "number"
+		  @stack << token.lexeme.to_f
+
+		when "operator"
+		  v2 = @stack.pop
+		  v1 = @stack.pop
+		  case token.lexeme
+		    when "+"
+			 @stack << v1 + v2 
+		    when "-"
+			 @stack << v1 - v2 
+		    when "*"
+			 @stack << v1 * v2 
+		    when "/"
+			 @stack << v1 / v2
+		  end
+
+		else
+          raise BadToken, token.to_s
+      end
+	end
+
+	return @stack.pop
+  end
 
 end

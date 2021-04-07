@@ -95,7 +95,92 @@ def parser_translate
 
 end
 
+def stack_run
+
+  puts "STACK RUN TEST"
+  puts "=============="
+
+  lex = Lexer.new
+  par = Parser.new
+  stk = StackMachine.new
+
+  test = "2 + 2"
+  puts test
+  lex.line = test
+  par.tokens = lex.run
+  polish = par.parse
+  puts "The result is: " + stk.run(polish).to_s
+  puts "-----"
+
+  test = "2 * (9-6)"
+  puts test
+  lex.line = test
+  par.tokens = lex.run
+  polish = par.parse
+  puts "The result is: " + stk.run(polish).to_s
+  puts "-----"
+
+  test = "3.141592 * 3.141592"
+  puts test
+  lex.line = test
+  par.tokens = lex.run
+  polish = par.parse
+  puts "The result is: " + stk.run(polish).to_s
+  puts "-----"
+
+  begin
+    test = "abcde"
+	puts test
+	lex.line = test
+	par.tokens = lex.run
+	polish = par.parse
+	puts "The result is: " + stk.run(polish).to_s
+  rescue Exception => e
+    puts e.inspect
+  end
+  puts "-----"
+
+  begin
+    test = ""
+	puts test
+	lex.line = test
+	par.tokens = lex.run
+	polish = par.parse
+	puts "The result is: " + stk.run(polish).to_s
+  rescue Exception => e
+    puts e.inspect
+  end
+  puts "-----"
+
+  begin
+    test = "2 + 2 /"
+	puts test
+	lex.line = test
+	par.tokens = lex.run
+	polish = par.parse
+	puts "The result is: " + stk.run(polish).to_s
+  rescue Exception => e
+    puts e.inspect
+  end
+  puts "-----"
+
+  begin
+    test = "1 2 3"
+	puts test
+	lex.line = test
+	par.tokens = lex.run
+	polish = par.parse
+	puts "The result is: " + stk.run(polish).to_s
+  rescue Exception => e
+    puts e.inspect
+  end
+  puts "-----"
+
+  puts
+end
+
 lexer_run
 token_equals
 parser_match
 parser_translate
+stack_run

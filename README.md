@@ -13,6 +13,6 @@ The idea is that it could parse expressions given by the user, printing the eval
   - [x] Lexer errors
 - [x] Parser
 - [x] Stack machine
-- [ ] Main loop with lexer, parser and stack machine
+- [x] Main loop with lexer, parser and stack machine
 - [ ] The lesser known operators: '^' and '%'
 - [ ] Scientific notation

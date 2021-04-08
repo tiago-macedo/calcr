@@ -11,7 +11,9 @@ while true
     parser.tokens = lexer.run
 	result = stack.run(parser.parse)
 	puts "§ " + result.to_s
+	puts
   rescue Interrupt
+    puts
     exit
   rescue Exception => e
     puts "An error ocurred:"

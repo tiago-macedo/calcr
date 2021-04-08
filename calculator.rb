@@ -139,7 +139,7 @@ class Parser
       match "operator"
       v2 = fact
 	  v3 = term_
-      return join(join(v2, over), v3)
+      return join(join(v2, [over]), v3)
     end
     return nil
   end

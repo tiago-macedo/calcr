@@ -14,5 +14,8 @@ The idea is that it could parse expressions given by the user, printing the eval
 - [x] Parser
 - [x] Stack machine
 - [x] Main loop with lexer, parser and stack machine
+  - [ ] Ability to move cursor left and right
+  - [ ] Arrow up/down moves through list of previous input lines
+    - [ ] Save input lines
 - [ ] The lesser known operators: '^' and '%'
 - [ ] Scientific notation
